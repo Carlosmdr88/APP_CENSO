@@ -1,0 +1,17 @@
+APP CENSO - Primera conexión con Supabase
+
+1. Extraer todo el ZIP.
+2. Abrir esta carpeta en VS Code.
+3. Abrir index.html con Live Server (Go Live). Se requiere Internet.
+4. Ingresar con el correo y contraseña del usuario autorizado.
+
+Archivos: index.html, style.css, config.js, app.js.
+La clave publishable es pública; los permisos se controlan en Supabase mediante RLS.
+
+Disponible: inicio de sesión real, autorización, registro manual con foto, lista de las últimas 100 personas, lectura de fotografías privadas e historial de consultas existente.
+El filtro busca entre esos 100 registros. No implementa aún búsqueda facial, edición, borrado ni auditoría automática de lecturas.
+Las sesiones no se conservan al recargar.
+Si falla parte del guardado, mantener la página abierta y reintentar Guardar; conserva el ID para no duplicar la persona. Si se cierra antes de completar, revisar el registro en Supabase.
+
+En Authentication, deshabilitar el registro público de nuevas cuentas. No usar claves secret/service_role en estos archivos.
+Validación: sintaxis JavaScript y referencias locales comprobadas. No se ha probado el acceso a tu proyecto ni se han creado registros de prueba.
