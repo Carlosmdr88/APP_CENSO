@@ -189,11 +189,18 @@ async function photos(id, row) {
   }
 }
 function photo(blob) {
+  if (busy) return message("Esperá a que termine el guardado.");
   if (pending)
     return message(
       "Completá el guardado pendiente antes de cambiar la fotografía.",
     );
   photoBlob = blob;
+  const resultadoAnterior = document.getElementById("result");
+  resultadoAnterior.replaceChildren();
+
+  const avisoNuevaFoto = document.createElement("p");
+  avisoNuevaFoto.textContent = "Fotografía nueva. Pulsá Buscar para consultar.";
+  resultadoAnterior.append(avisoNuevaFoto);
   if (photoURL) URL.revokeObjectURL(photoURL);
   photoURL = URL.createObjectURL(blob);
   $("photo").src = photoURL;
@@ -315,6 +322,12 @@ $("form").onsubmit = async (e) => {
     if (pending && pending.uid !== uid)
       throw Error("La operación pendiente pertenece a otra sesión.");
     if (!pending) {
+      const fotoParaValidar = new FormData();
+      fotoParaValidar.append("foto", photoBlob, "registro.jpg");
+
+      await solicitarMotor("/validar_foto", {
+        body: fotoParaValidar,
+      });
       pending = {
         uid,
         id: crypto.randomUUID(),
@@ -391,6 +404,19 @@ $("form").onsubmit = async (e) => {
       }
       p.photoSaved = true;
     }
+
+    if (!p.descriptorSaved) {
+      const resultado = await solicitarMotor(
+        `/fotografias/${p.fileId}/descriptor`,
+      );
+
+      if (!resultado.descriptor_guardado) {
+        throw new Error("El descriptor no quedó guardado.");
+      }
+
+      p.descriptorSaved = true;
+    }
+
     pending = null;
     photoBlob = null;
     if (photoURL) URL.revokeObjectURL(photoURL);
@@ -401,7 +427,7 @@ $("form").onsubmit = async (e) => {
     form.reset();
     $("register").hidden = true;
     await page("personas");
-    message("Persona y fotografía guardadas en Supabase.");
+    message("Persona, fotografía y descriptor guardados correctamente.");
   } catch (e) {
     message(
       (pending
@@ -497,8 +523,8 @@ botonBuscar.onclick = async () => {
 
     const aviso = document.createElement("p");
     aviso.textContent =
-      "Candidatos de prueba, sin umbral. " +
-      "La similitud no confirma la identidad.";
+      "Posibles candidatos con filtro provisional de prueba. " +
+      "Requieren revisión; no confirman la identidad.";
     contenedor.append(aviso);
 
     const candidatos = resultado.candidatos || [];
@@ -506,8 +532,8 @@ botonBuscar.onclick = async () => {
     if (!candidatos.length) {
       const texto = document.createElement("p");
       texto.textContent =
-        "No hay candidatos disponibles. " +
-        "Comprobá que las fotografías tengan descriptores.";
+        "No se devolvieron candidatos con el filtro actual. " +
+        "Esto no garantiza que la persona no esté registrada.";
       contenedor.append(texto);
     }
 
@@ -539,3 +565,45 @@ botonBuscar.onclick = async () => {
     botonBuscar.textContent = "Buscar coincidencias · Prueba";
   }
 };
+
+async function solicitarMotor(ruta, opciones = {}) {
+  const { data, error } = await db.auth.getSession();
+
+  if (error || !data.session) {
+    throw new Error("La sesión venció. Volvé a ingresar.");
+  }
+
+  const controlador = new AbortController();
+  const tiempo = setTimeout(() => controlador.abort(), 60000);
+
+  try {
+    const respuesta = await fetch("http://127.0.0.1:8000" + ruta, {
+      ...opciones,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${data.session.access_token}`,
+      },
+      signal: controlador.signal,
+    });
+
+    const resultado = await respuesta.json();
+
+    if (!respuesta.ok) {
+      throw new Error(
+        typeof resultado.detail === "string"
+          ? resultado.detail
+          : "No se pudo completar la operación del motor.",
+      );
+    }
+
+    return resultado;
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("El motor superó el tiempo de espera. Reintentá.");
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(tiempo);
+  }
+}

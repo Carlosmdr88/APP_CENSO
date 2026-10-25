@@ -7,6 +7,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from motor_facial import generar_descriptor, MODELO, MAX_BYTES
 from procesar_fotos import db
 
+from uuid import UUID
+from procesar_fotos import procesar
+
 router = APIRouter()
 seguridad = HTTPBearer()
 bloqueo_busqueda = Lock()
@@ -92,7 +95,7 @@ def buscar(
                     similitud = float(np.clip(
                         np.dot(consulta, vector / norma), -1, 1
                     ))
-
+                if similitud >= 0.60:
                     resultados.append(
                         (similitud, fila["fotografia_id"])
                     )
@@ -150,4 +153,80 @@ def buscar(
     except Exception:
         raise HTTPException(
             503, "No se pudo completar la búsqueda."
+        )
+@router.post("/validar_foto")
+def validar_foto(
+    foto: UploadFile,
+    usuario_id: str = Depends(usuario_autorizado)
+    ):
+    try:
+        contenido = foto.file.read(MAX_BYTES + 1)
+    finally:
+        foto.file.close()
+
+    try:
+        generar_descriptor(contenido)
+    except ValueError as error:
+        raise HTTPException(400, str(error))
+
+    return {"foto_valida": True}
+
+
+@router.post("/fotografias/{fotografia_id}/descriptor")
+def guardar_descriptor(
+    fotografia_id: UUID,
+    usuario_id: str = Depends(usuario_autorizado)
+):
+    try:
+        fotos = (
+            db.table("fotografias")
+            .select("id,ruta_storage,creado_por")
+            .eq("id", str(fotografia_id))
+            .limit(1)
+            .execute()
+            .data
+        )
+
+        if not fotos:
+            raise HTTPException(404, "No se encontró la fotografía.")
+
+        foto = fotos[0]
+
+        # El operador puede procesar sus propias fotografías.
+        # El administrador puede procesar cualquier registro.
+        if foto["creado_por"] != usuario_id:
+            administradores = (
+                db.table("usuarios_autorizados")
+                .select("id")
+                .eq("id", usuario_id)
+                .eq("activo", True)
+                .eq("rol", "administrador")
+                .limit(1)
+                .execute()
+                .data
+            )
+
+            if not administradores:
+                raise HTTPException(
+                    403, "No podés procesar esta fotografía."
+                )
+
+        with bloqueo_busqueda:
+            procesar(foto)
+
+        return {
+            "descriptor_guardado": True,
+            "fotografia_id": str(fotografia_id)
+        }
+
+    except HTTPException:
+        raise
+
+    except ValueError as error:
+        raise HTTPException(400, str(error))
+
+    except Exception:
+        raise HTTPException(
+            503,
+            "No se pudo guardar el descriptor. Intentá nuevamente."
         )
