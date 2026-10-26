@@ -4,7 +4,10 @@
     name="viewport"
     content="width=device-width,initial-scale=1"
   /><title>CENSO · Registro de personas</title
-  ><link rel="stylesheet" href="style.css" /><link rel="stylesheet" href="ajustes.css" />
+  ><link rel="stylesheet" href="style.css" /><link
+    rel="stylesheet"
+    href="ajustes.css"
+  />
   <body>
     <aside>
       <div class="brand">CENSO<small>GESTIÓN DE PERSONAS</small></div>
@@ -41,7 +44,10 @@
         </div>
         <span class="badge">● Primera versión conectada</span>
       </div>
-      <div class="notice">Acceso autorizado · Reconocimiento local con filtro provisional. Las posibles coincidencias requieren confirmación del operador.</div>
+      <div class="notice">
+        Acceso autorizado · Reconocimiento local con filtro provisional. Las
+        posibles coincidencias requieren confirmación del operador.
+      </div>
       <section id="consulta">
         <div class="steps">
           <span class="current"><b>1</b> Capturar foto</span
@@ -49,10 +55,30 @@
           ><span><b>3</b> Registrar</span>
         </div>
         <form id="contextForm" class="card contexto">
-<h2>Datos de la consulta</h2><p class="sub">Fecha y hora automáticas. Indicá el lugar y el motivo antes de buscar.</p>
-<div class="fields"><label>Distrito<select id="queryDistrict" required></select></label>
-<label id="queryOtherWrap" hidden>Especificá otro lugar<input id="queryOther" maxlength="140" data-upper></label>
-<label class="full">Motivo de consulta<input id="queryReason" required maxlength="500" data-upper placeholder="INDICÁ EL MOTIVO"></label></div></form><div class="grid">
+          <h2>Datos de la consulta</h2>
+          <p class="sub">
+            Fecha y hora automáticas. Indicá el lugar y el motivo antes de
+            buscar.
+          </p>
+          <div class="fields">
+            <label>Distrito<select id="queryDistrict" required></select></label>
+            <label id="queryOtherWrap" hidden
+              >Especificá otro lugar<input
+                id="queryOther"
+                maxlength="140"
+                data-upper
+            /></label>
+            <label class="full"
+              >Motivo de consulta<input
+                id="queryReason"
+                required
+                maxlength="500"
+                data-upper
+                placeholder="INDICÁ EL MOTIVO"
+            /></label>
+          </div>
+        </form>
+        <div class="grid">
           <article class="card">
             <h2>Fotografía de consulta</h2>
             <p class="sub">Ubicá el rostro de frente, con buena iluminación.</p>
@@ -71,14 +97,24 @@
             <button class="wide" id="searchBtn" disabled>
               Buscar posibles coincidencias
             </button>
-            <p class="hint">Esta foto se utiliza para buscar y como principal al registrar una persona.</p>
+            <p class="hint">
+              Esta foto se utiliza para buscar y como principal al registrar una
+              persona.
+            </p>
           </article>
           <article class="card">
             <h2>Resultado de la consulta</h2>
             <p class="sub">Revisá el resultado antes de continuar.</p>
-            <div id="result"><p>Tomá o subí una fotografía para comenzar.</p></div>
-<div class="examples">Si no corresponde a un registro existente, podés crear uno nuevo.<br>
-<button id="newPerson" type="button">Registrar nueva persona</button></div>
+            <div id="result">
+              <p>Tomá o subí una fotografía para comenzar.</p>
+            </div>
+            <div class="examples">
+              Si no corresponde a un registro existente, podés crear uno
+              nuevo.<br />
+              <button id="newPerson" type="button">
+                Registrar nueva persona
+              </button>
+            </div>
           </article>
         </div>
         <article class="card" id="register" hidden style="margin-top: 24px">
@@ -88,22 +124,106 @@
           </p>
           <form id="form">
             <div class="fields">
-<label class="full">Nombre completo<input name="nombre" required maxlength="160" data-upper placeholder="NOMBRE COMPLETO"></label>
-<label>Fecha de nacimiento<input name="fecha" type="text" required inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" title="Día/mes/año, por ejemplo 02/04/1990"></label>
-<label>Identificación<input name="identificacion" required maxlength="50" data-upper data-documento placeholder="IDENTIFICACIÓN SIN ESPACIOS NI GUIONES"></label>
-<label>Nacionalidad<input name="nacionalidad" required maxlength="80" data-upper placeholder="EJ.: COSTARRICENSE"></label>
-<label>Tipo de documento<select name="tipo"><option value="identificacion">IDENTIFICACIÓN</option><option value="pasaporte">PASAPORTE</option><option value="residencia">RESIDENCIA</option><option value="otro">OTRO</option></select></label>
-<label>Distrito del primer registro<select name="distrito" id="registerDistrict" required></select></label>
-<label id="registerOtherWrap" hidden>Especificá otro lugar<input name="otroDistrito" id="registerOther" maxlength="140" data-upper></label>
-<label class="full">Motivo de consulta / primer registro<input name="motivo" required maxlength="500" data-upper placeholder="INDICÁ EL MOTIVO"></label>
-<div class="full"><strong>Fotografía principal</strong><p class="sub">Se usará la fotografía de la consulta. Solo esta participa en reconocimiento.</p></div>
-<label class="full">Fotos de respaldo (opcional, máximo 3)<input id="backupFiles" type="file" multiple accept="image/jpeg,image/png,image/webp"><span class="sub">Para consulta visual de otras señas; no se analizan rostros.</span></label>
-<div id="backupPreview" class="galeria full"></div>
-<div class="full"><button id="clearBackups" type="button" class="secondary">Quitar selección de respaldos</button></div>
-<p class="sub full">La fecha del primer registro se guarda automáticamente y no cambia en consultas posteriores.</p>
-<label class="check full"><input type="checkbox" required>Confirmo que revisé los datos y la identificación antes de registrar.</label>
-</div>
-<div class="actions" style="margin-top: 22px">
+              <label class="full"
+                >Nombre completo<input
+                  name="nombre"
+                  required
+                  maxlength="160"
+                  data-upper
+                  placeholder="NOMBRE COMPLETO"
+              /></label>
+              <label
+                >Fecha de nacimiento<input
+                  name="fecha"
+                  type="text"
+                  required
+                  inputmode="numeric"
+                  maxlength="10"
+                  placeholder="DD/MM/AAAA"
+                  pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
+                  title="Día/mes/año, por ejemplo 02/04/1990"
+              /></label>
+              <label
+                >Identificación<input
+                  name="identificacion"
+                  required
+                  maxlength="50"
+                  data-upper
+                  data-documento
+                  placeholder="IDENTIFICACIÓN SIN ESPACIOS NI GUIONES"
+              /></label>
+              <label
+                >Nacionalidad<input
+                  name="nacionalidad"
+                  required
+                  maxlength="80"
+                  data-upper
+                  placeholder="EJ.: COSTARRICENSE"
+              /></label>
+              <label
+                >Tipo de documento<select name="tipo">
+                  <option value="identificacion">IDENTIFICACIÓN</option>
+                  <option value="pasaporte">PASAPORTE</option>
+                  <option value="residencia">RESIDENCIA</option>
+                  <option value="otro">OTRO</option>
+                </select></label
+              >
+              <label
+                >Distrito del primer registro<select
+                  name="distrito"
+                  id="registerDistrict"
+                  required
+                ></select
+              ></label>
+              <label id="registerOtherWrap" hidden
+                >Especificá otro lugar<input
+                  name="otroDistrito"
+                  id="registerOther"
+                  maxlength="140"
+                  data-upper
+              /></label>
+              <label class="full"
+                >Motivo de consulta / primer registro<input
+                  name="motivo"
+                  required
+                  maxlength="500"
+                  data-upper
+                  placeholder="INDICÁ EL MOTIVO"
+              /></label>
+              <div class="full">
+                <strong>Fotografía principal</strong>
+                <p class="sub">
+                  Se usará la fotografía de la consulta. Solo esta participa en
+                  reconocimiento.
+                </p>
+              </div>
+              <label class="full"
+                >Fotos de respaldo (opcional, máximo 3)<input
+                  id="backupFiles"
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp"
+                /><span class="sub"
+                  >Para consulta visual de otras señas; no se analizan
+                  rostros.</span
+                ></label
+              >
+              <div id="backupPreview" class="galeria full"></div>
+              <div class="full">
+                <button id="clearBackups" type="button" class="secondary">
+                  Quitar selección de respaldos
+                </button>
+              </div>
+              <p class="sub full">
+                La fecha del primer registro se guarda automáticamente y no
+                cambia en consultas posteriores.
+              </p>
+              <label class="check full"
+                ><input type="checkbox" required />Confirmo que revisé los datos
+                y la identificación antes de registrar.</label
+              >
+            </div>
+            <div class="actions" style="margin-top: 22px">
               <button>Guardar persona</button
               ><button type="button" class="secondary" id="cancel">
                 Cancelar
@@ -130,9 +250,14 @@
         <div id="logs"></div>
       </section>
       <section id="ficha" class="card" hidden>
-<div class="actions"><button id="closeDetail" class="secondary" type="button">Volver a personas</button></div>
-<div id="detailContent"></div></section>
-<div class="bottom">
+        <div class="actions">
+          <button id="closeDetail" class="secondary" type="button">
+            Volver a personas
+          </button>
+        </div>
+        <div id="detailContent"></div>
+      </section>
+      <div class="bottom">
         <span>CENSO / Gestión de personas</span
         ><span>Registro y consultas · Versión 02</span>
       </div>
